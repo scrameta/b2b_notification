@@ -1,3 +1,4 @@
+#!/usr/bin/ruby -w
 require 'curses'
 require 'net/http'
 require 'uri'
