@@ -22,10 +22,6 @@ class TradeSeeder
     @database = database
     @investment_date = investment_date
 
-    fetch_prices
-  end
-
-  def seed(client, portfolio, investment)
     # Recommended in data science slides, for performance
     # Use wrapped python!
     # https://fr.slideshare.net/urubatan/data-science-in-ruby-is-it-possible-is-it-fast-should-we-use-it-169709579
@@ -33,39 +29,53 @@ class TradeSeeder
     pyimport :numpy, as: :np
     pyimport :pandas, as: :pd
 
-    df = pd.DataFrame.new(data: { ticker: @ticker, openprice: @openprice })
-    value_of_each = investment / df.shape[0]
-    shares = np.floor(value_of_each / df.openprice)
-    df['shares'] = shares
-    invested = (df.shares * df.openprice).sum
-    cash = investment - invested
+    fetch_prices
+  end
 
-    # This is our initial portfolio, as of this date
-    puts df
-    puts "cash:#{cash}"
+  def seed(client, portfolio_name, investment)
+    target_portfolio = compute_portfolio(investment)
+    dump_portfolio(target_portfolio, investment)
 
     # To apply it to other dates, we have corporate actions to deal with, splits, dividends, mergers etc.
     # For now keep it simple and just store these trades
 
     # Store it for a client
-    portfolio = @database["select p.id from portfolios p join clients c on p.client_id=c.id where c.username='#{client}' limit 1"]
+    portfolio_id = @database["select p.id from portfolios p join clients c on p.client_id=c.id where c.username='#{client}' and p.name='#{portfolio_name}'"]
 
     # ticker,buy/sell,price,qty,date
-    portfolios = Array.new(df.shape[0], portfolio)
-    investment_dates = Array.new(df.shape[0], @investment_date)
-    ticker_array = df.ticker.to_numpy.tolist
-    side = Array.new(df.shape[0], 1) # 1=buy,2=sell,3=shortsell etc
-    price = df.openprice.to_numpy.tolist
-    quantity = df.shares.to_numpy.tolist
-    rows = ticker_array.zip(side, price, quantity, investment_dates, portfolios)
+    portfolio_ids = Array.new(target_portfolio.shape[0], portfolio_id)
+    investment_dates = Array.new(target_portfolio.shape[0], @investment_date)
+    ticker_array = target_portfolio.ticker.to_numpy.tolist
+    side = Array.new(target_portfolio.shape[0], 1) # 1=buy,2=sell,3=shortsell etc
+    price = target_portfolio.price.to_numpy.tolist
+    quantity = target_portfolio.shares.to_numpy.tolist
+    rows = ticker_array.zip(side, price, quantity, investment_dates, portfolio_ids)
     @database[:trades].import(%i[ticker side price quantity tradeDate portfolio_id], rows)
   end
 
   private
 
+  def compute_portfolio(investment)
+    value_of_each = investment / @prices.shape[0]
+    shares = np.floor(value_of_each / @prices.price)
+    target_portfolio = @prices.clone
+    target_portfolio['shares'] = shares
+    return target_portfolio
+  end
+
+  def dump_portfolio(target_portfolio, investment)
+    invested = (target_portfolio.shares * target_portfolio.price).sum
+    remaining_cash = investment - invested
+
+    puts "Compute portfolio:"
+    puts target_portfolio
+    puts "Remaining cash: #{remaining_cash}"
+  end
+
   def fetch_prices
+    # 'execution' price for our trades, which we did in the opening auction!
     opens = <<~END_SQL
-      select ticker,open,date from market_data where date='#{@investment_date.strftime('%F')}' limit 40
+      select ticker,open,date from market_data where date='#{@investment_date.strftime('%F')}'
     END_SQL
     # Direct fetch with sequels
     opens_data = DB[opens]
@@ -75,10 +85,10 @@ class TradeSeeder
       ticker.append(row[:ticker])
       openprice.append(row[:open])
     end
-    @ticker = ticker
-    @openprice = openprice
+    @prices = pd.DataFrame.new(data: { ticker: ticker, price: openprice })
   end
 end
 
 seeder = TradeSeeder.new(database = DB, investment_date = Date.new(2020, 10, 1))
-positions = seeder.seed(client = 'bgates', portfolio = 'myfirstportfolio', investment = 100_000)
+positions = seeder.seed(client = 'bgates', portfolio = 'my first portfolio', investment = 100_000)
+positions = seeder.seed(client = 'mzuckerberg', portfolio = 'save the world', investment = 500_000)

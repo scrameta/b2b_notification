@@ -19,8 +19,8 @@ class ClientPortfoliosController < ApplicationController
     client = verify_client { return }
     username = client.username
     portfolio = Portfolio.find(params.require(:id))
-    dt = Date.today
-    positiondf = portfolio_as_of(portfolio, username, dt)
+    portfolio_date = Date.today
+    positiondf = portfolio_as_of(portfolio, username, portfolio_date)
     ticker = positiondf.ticker.to_numpy.tolist
     pos = positiondf.pos.to_numpy.tolist
     @positions = []
@@ -34,13 +34,13 @@ class ClientPortfoliosController < ApplicationController
     username = client.username
     portfolio = Portfolio.find(params.require(:id))
 
-    dt = Date.new(2020, 12, 3) # TODO: should be now, but do not want to fetch new data
-    positiondf = portfolio_as_of(portfolio, username, dt)
+    value_date = Date.new(2020, 12, 3) # TODO: should be now, but do not want to fetch new data
+    positiondf = portfolio_as_of(portfolio, username, value_date)
 
     query = <<END_SQL
-    select ticker,adjusted_close,close,date from market_data where date='#{dt.strftime('%F')}'
+    select ticker,adjusted_close,close,date from market_data where date='#{value_date.strftime('%F')}'
 END_SQL
-    mktdata = queryToDataFrame(query)
+    mktdata = query_to_data_frame(query)
     mktdata = mktdata.set_index(mktdata.ticker)
     positiondf[:close] = mktdata.close
 
@@ -69,7 +69,7 @@ END_SQL
     query = <<~END_SQL
       select ticker,adjusted_close,close,date from market_data where date>='#{return_from.strftime('%F')}' and date<='#{return_to.strftime('%F')}'
     END_SQL
-    mktdata = queryToDataFrame(query)
+    mktdata = query_to_data_frame(query)
     mktdata[:returns] = mktdata.groupby(:ticker).adjusted_close.pct_change.fillna(0)
 
     # Get position at start - in reality we'd need to handle intraday pnl,
@@ -105,10 +105,10 @@ END_SQL
     twr = position.twrPeriod.to_numpy.tolist
     weight = weight.to_numpy.tolist
 
-    @totalReturnTWR = return_twr.tolist
-    @returnTWR = []
+    @total_time_weighted_return = return_twr.tolist
+    @ticker_time_weighted_return = []
     ticker.zip(twr, weight).each do |value|
-      @returnTWR.append({ ticker: value[0], totalWeightedReturn: value[1], weight: value[2] })
+      @ticker_time_weighted_return.append({ ticker: value[0], time_weighted_return: value[1], weight: value[2] })
     end
   end
 
@@ -120,7 +120,7 @@ END_SQL
   end
 
   # run query and convert result to a pandas dataframe
-  def queryToDataFrame(query)
+  def query_to_data_frame(query)
     pyimport :math
     pyimport :numpy, as: :np
     pyimport :pandas, as: :pd
@@ -153,7 +153,7 @@ END_SQL
 
   # Get position from trades - in reality we'd need to handle more
   # e.g. intraday pnl, position changes, corporate actions(splits, divs, mergers), tax in period etc
-  def portfolio_as_of(portfolio, username, dt)
+  def portfolio_as_of(portfolio, username, position_date)
     portfolioname = portfolio.name
     # Get portfolio
     query = <<~END_SQL
@@ -164,10 +164,10 @@ END_SQL
         where
          cl.username = '#{username}'
          and pr.name = '#{portfolioname}'
-         and tr.tradeDate < '#{dt.strftime('%F')}'
+         and tr.tradeDate < '#{position_date.strftime('%F')}'
         order by tr.tradeDate asc
     END_SQL
-    trades = queryToDataFrame(query)
+    trades = query_to_data_frame(query)
     if trades.shape[0].positive?
       trades[:posChange] = (trades[:side] == 1 ? 1 : -1) * trades[:quantity]
       trades[:pos] = trades.groupby(:ticker).posChange.cumsum

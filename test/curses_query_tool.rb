@@ -278,7 +278,7 @@ begin
       req['Authorization'] = @auth_token
 
       res = Net::HTTP.start(uri.hostname, uri.port) { |http| http.request(req) }
-      clients = (JSON.parse(res.body) if res.code == '200')
+      clients = JSON.parse(res.body) if res.code == '200'
     end
 
     def create
@@ -296,6 +296,7 @@ begin
       req['Authorization'] = @auth_token
 
       res = Net::HTTP.start(uri.hostname, uri.port) { |http| http.request(req) }
+      return res
     end
 
     def show(id)
