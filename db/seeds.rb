@@ -13,7 +13,8 @@ Employee.create({ name: 'John', surname: 'Smith', username: 'johns', admin: fals
 User.create!(email: 'markw@yova.ch', password: 'foo', password_confirmation: 'foo', name: 'markw')
 User.create!(email: 'johns@yova.ch', password: 'bar', password_confirmation: 'bar', name: 'johns')
 User.create!(email: 'mrgates@microsoft.com', password: 'password1', password_confirmation: 'password1', name: 'bgates')
-User.create!(email: 'zucker@facebook.com', password: 'password2', password_confirmation: 'password2', name: 'mzuckerberg')
+User.create!(email: 'zucker@facebook.com', password: 'password2', password_confirmation: 'password2',
+             name: 'mzuckerberg')
 User.create!(email: 'gorilla@lehman.com', password: 'password3', password_confirmation: 'password3', name: 'dfuld')
 @cl = Client.create({ name: 'Bill', surname: 'Gates', username: 'bgates' })
 Portfolio.create({ name: 'my first portfolio', client: @cl })

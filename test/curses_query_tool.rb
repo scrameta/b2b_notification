@@ -106,7 +106,7 @@ begin
       req['Authorization'] = @auth_token
 
       res = Net::HTTP.start(uri.hostname, uri.port) { |http| http.request(req) }
-      portfolios = (JSON.load(res.body) if res.code == '200')
+      portfolios = (JSON.parse(res.body) if res.code == '200')
     end
 
     def content(id)
@@ -118,7 +118,7 @@ begin
 
       res = Net::HTTP.start(uri.hostname, uri.port) { |http| http.request(req) }
 
-      notifications = JSON.load(res.body)
+      notifications = JSON.parse(res.body)
     end
 
     def valuation(id)
@@ -130,7 +130,7 @@ begin
 
       res = Net::HTTP.start(uri.hostname, uri.port) { |http| http.request(req) }
 
-      notifications = JSON.load(res.body)
+      notifications = JSON.parse(res.body)
     end
 
     def return(id)
@@ -142,7 +142,7 @@ begin
 
       res = Net::HTTP.start(uri.hostname, uri.port) { |http| http.request(req) }
 
-      notifications = JSON.load(res.body)
+      notifications = JSON.parse(res.body)
     end
   end
 
@@ -159,7 +159,7 @@ begin
       req['Authorization'] = @auth_token
 
       res = Net::HTTP.start(uri.hostname, uri.port) { |http| http.request(req) }
-      notifications = (JSON.load(res.body) if res.code == '200')
+      notifications = (JSON.parse(res.body) if res.code == '200')
     end
 
     def show(id)
@@ -171,7 +171,7 @@ begin
 
       res = Net::HTTP.start(uri.hostname, uri.port) { |http| http.request(req) }
 
-      notifications = JSON.load(res.body)
+      notifications = JSON.parse(res.body)
     end
   end
 
@@ -188,7 +188,7 @@ begin
       req['Authorization'] = @auth_token
 
       res = Net::HTTP.start(uri.hostname, uri.port) { |http| http.request(req) }
-      notifications = (JSON.load(res.body) if res.code == '200')
+      notifications = (JSON.parse(res.body) if res.code == '200')
     end
 
     def show(id)
@@ -200,7 +200,7 @@ begin
 
       res = Net::HTTP.start(uri.hostname, uri.port) { |http| http.request(req) }
 
-      notifications = JSON.load(res.body)
+      notifications = JSON.parse(res.body)
     end
 
     def delete(id)
@@ -212,7 +212,7 @@ begin
 
       res = Net::HTTP.start(uri.hostname, uri.port) { |http| http.request(req) }
 
-      notifications = JSON.load(res.body)
+      JSON.parse(res.body)
     end
 
     def update(id)
@@ -227,7 +227,7 @@ begin
       req = Net::HTTP::Put.new(uri)
       req.set_form_data({ 'message' => message })
       req['Authorization'] = @auth_token
-      res = Net::HTTP.start(uri.hostname, uri.port) { |http| http.request(req) }
+      Net::HTTP.start(uri.hostname, uri.port) { |http| http.request(req) }
     end
 
     def create
@@ -243,7 +243,7 @@ begin
       req.set_form_data({ 'message' => message })
       req['Authorization'] = @auth_token
 
-      res = Net::HTTP.start(uri.hostname, uri.port) { |http| http.request(req) }
+      Net::HTTP.start(uri.hostname, uri.port) { |http| http.request(req) }
     end
   end
 
@@ -260,7 +260,7 @@ begin
       req['Authorization'] = @auth_token
 
       res = Net::HTTP.start(uri.hostname, uri.port) { |http| http.request(req) }
-      clients = (JSON.load(res.body) if res.code == '200')
+      clients = (JSON.parse(res.body) if res.code == '200')
     end
   end
 
@@ -278,7 +278,7 @@ begin
       req['Authorization'] = @auth_token
 
       res = Net::HTTP.start(uri.hostname, uri.port) { |http| http.request(req) }
-      clients = (JSON.load(res.body) if res.code == '200')
+      clients = (JSON.parse(res.body) if res.code == '200')
     end
 
     def create
@@ -287,7 +287,7 @@ begin
       cli = clients.index
 
       cl = cli.map { |cli_i| cli_i['username'] }
-      sel, id = Menu.start(cl)
+      sel, = Menu.start(cl)
 
       url = "#{$baseurl}notifications/#{@notification_id}/assignments.json"
       uri = URI.parse(url)
@@ -307,7 +307,7 @@ begin
 
       res = Net::HTTP.start(uri.hostname, uri.port) { |http| http.request(req) }
 
-      notifications = JSON.load(res.body)
+      notifications = JSON.parse(res.body)
     end
 
     def delete(id)
@@ -319,7 +319,7 @@ begin
 
       res = Net::HTTP.start(uri.hostname, uri.port) { |http| http.request(req) }
 
-      notifications = JSON.load(res.body)
+      JSON.parse(res.body)
     end
 
     def update(id)
@@ -328,20 +328,20 @@ begin
       cli = clients.index
 
       cl = cli.map { |cli_i| cli_i['username'] }
-      sel, id = Menu.start(cl)
+      sel, = Menu.start(cl)
 
       url = $baseurl + "assignments/#{id}.json"
       uri = URI.parse(url)
       req = Net::HTTP::Put.new(uri)
       req.set_form_data({ 'client' => sel })
       req['Authorization'] = @auth_token
-      res = Net::HTTP.start(uri.hostname, uri.port) { |http| http.request(req) }
+      Net::HTTP.start(uri.hostname, uri.port) { |http| http.request(req) }
     end
   end
 
-  def msg(text, y = Curses.lines / 2, x = Curses.cols / 2)
+  def msg(text, ypos = Curses.lines / 2, xpos = Curses.cols / 2)
     Curses.clear
-    Curses.setpos(y, x)
+    Curses.setpos(ypos, xpos)
     Curses.addstr(text)
     Curses.refresh
     Curses.getch
@@ -349,7 +349,7 @@ begin
 
   def mainloop
     loop do
-      user, pos = Menu.start(%w[bgates dfuld mzuckerberg johns markw hacker])
+      user, = Menu.start(%w[bgates dfuld mzuckerberg johns markw hacker])
 
       auth_token = authenticate(user)
       unless auth_token
@@ -357,7 +357,7 @@ begin
         next
       end
 
-      type, pos = Menu.start(%w[Admin Portfolio Notification])
+      type, = Menu.start(%w[Admin Portfolio Notification])
       case type
       when 'Admin'
         notifications = Notifications.new(auth_token)
@@ -372,7 +372,7 @@ begin
             notifications.create
             next
           end
-          action, pos = Menu.start(["Show:#{id}", "Update:#{id}", "Delete:#{id}", "Assign:#{id}"])
+          _, pos = Menu.start(["Show:#{id}", "Update:#{id}", "Delete:#{id}", "Assign:#{id}"])
           case pos
           when 0
             notif = notifications.show(id)
@@ -380,7 +380,7 @@ begin
           when 1
             notifications.update(id)
           when 2
-            notif = notifications.delete(id)
+            notifications.delete(id)
             msg('DELETED')
           when 3
             # Get assignments
@@ -395,7 +395,7 @@ begin
               assignments.create
               next
             end
-            action, pos = Menu.start(["Show:#{id}", "Update:#{id}", "Delete:#{id}"])
+            _, pos = Menu.start(["Show:#{id}", "Update:#{id}", "Delete:#{id}"])
             case pos
             when 0
               notif = assignments.show(id)
@@ -403,7 +403,7 @@ begin
             when 1
               assignments.update(id)
             when 2
-              notif = assignments.delete(id)
+              assignments.delete(id)
               msg('DELETED')
             end
 
@@ -424,9 +424,9 @@ begin
           port.each do |section|
             names.append("#{section['id']}:#{section['name']}")
           end
-          name, pos = Menu.start(names)
+          _, pos = Menu.start(names)
           id = port[pos]['id']
-          action, pos = Menu.start(["Show:#{id}", "Valuation:#{id}", "Return:#{id}"])
+          _, pos = Menu.start(["Show:#{id}", "Valuation:#{id}", "Return:#{id}"])
           case pos
           when 0
             notif = portfolios.content(id)
@@ -448,7 +448,7 @@ begin
           msg('DENIED')
         elsif !note.empty?
           ids = note.map { |nt| nt['id'] }
-          sel, id = Menu.start(ids)
+          sel, = Menu.start(ids)
           notif = notifications.show(sel)
           msg(JSON.pretty_generate(notif), 0, 0)
         else

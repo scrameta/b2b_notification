@@ -52,8 +52,8 @@ END_SQL
 
     @totalValueUSD = total.tolist
     @values = []
-    ticker.zip(value).each do |value|
-      @values.append({ ticker: value[0], valueUSD: value[1] })
+    ticker.zip(value).each do |val|
+      @values.append({ ticker: val[0], valueUSD: val[1] })
     end
   end
 
@@ -72,7 +72,8 @@ END_SQL
     mktdata = queryToDataFrame(query)
     mktdata[:returns] = mktdata.groupby(:ticker).adjusted_close.pct_change.fillna(0)
 
-    # Get position at start - in reality we'd need to handle intraday pnl, position changes, corporate actions(splits, divs, mergers), tax in period etc
+    # Get position at start - in reality we'd need to handle intraday pnl,
+    # position changes, corporate actions(splits, divs, mergers), tax in period etc
     # The client also probably still has a small cash balance too
     # These are handled in adjusted returns, but not if we change position
     # Now compute the twr
@@ -176,5 +177,6 @@ END_SQL
     else
       position = pd.DataFrame.new(data: { ticker: [], pos: [] })
     end
+    position
   end
 end
