@@ -177,7 +177,7 @@ begin
       url = $baseurl + "client_notifications/#{id}.json"
       uri = URI.parse(url)
 
-      req = Net::HTTP::Post.new(uri)
+      req = Net::HTTP::Get.new(uri)
       req['Authorization'] = @auth_token
 
       res = Net::HTTP.start(uri.hostname, uri.port) {|http| http.request(req) }
@@ -446,7 +446,9 @@ begin
           #get portfolios
           portfolios = Portfolios.new(auth_token)
           port = portfolios.index
-          if port
+          if port.empty?
+            msg('No portfolios')
+          elsif port
             names = []
             port.each do |section|
               names.append("#{section["id"]}:#{section["name"]}")

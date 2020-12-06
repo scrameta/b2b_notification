@@ -5,11 +5,10 @@ Rails.application.routes.draw do
   end
   resources :clients, only: [:index]
 
-  post 'client_notifications/:id', to: 'client_notifications#show'
-  get  'client_notifications', to: 'client_notifications#index'
-
+  resources :client_notifications, only: [:index,:show]
+  resources :client_portfolios, only: [:index]
+  #custom actions:
   get  'client_portfolios/:id/content', to: 'client_portfolios#content'
   get  'client_portfolios/:id/valuation', to: 'client_portfolios#valuation'
   get  'client_portfolios/:id/return', to: 'client_portfolios#return'
-  get  'client_portfolios', to: 'client_portfolios#index'
 end
