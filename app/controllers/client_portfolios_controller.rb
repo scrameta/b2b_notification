@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'byebug'
 require 'date'
 require 'pycall/import'
@@ -61,15 +63,15 @@ END_SQL
     portfolio = Portfolio.find(params.require(:id))
     return_from = Date.new(2020, 11, 2) # TODO: dates
     return_to = Date.new(2020, 12, 1)
-    positiondf = portfolio_as_of(portfolio, username, return_from) #In reality the position could change...
+    positiondf = portfolio_as_of(portfolio, username, return_from) # In reality the position could change...
 
     # Compute returns
-    query = <<END_SQL
-select ticker,adjusted_close,close,date from market_data where date>='#{return_from.strftime('%F')}' and date<='#{return_to.strftime("%F")}'
-END_SQL
+    query = <<~END_SQL
+      select ticker,adjusted_close,close,date from market_data where date>='#{return_from.strftime('%F')}' and date<='#{return_to.strftime('%F')}'
+    END_SQL
     mktdata = queryToDataFrame(query)
     mktdata[:returns] = mktdata.groupby(:ticker).adjusted_close.pct_change.fillna(0)
-    
+
     # Get position at start - in reality we'd need to handle intraday pnl, position changes, corporate actions(splits, divs, mergers), tax in period etc
     # The client also probably still has a small cash balance too
     # These are handled in adjusted returns, but not if we change position
@@ -97,11 +99,11 @@ END_SQL
     return_twr = (weight * position.twrPeriod).sum
     # return_SANITY = ((position.adjClosePost*position.pos).sum/(position.adjClosePre*position.pos).sum)-1
     # puts "Return TWR:#{return_twr*100}% value:#{return_SANITY*100}%"
-   
+
     ticker = position.ticker.to_numpy.tolist
     twr = position.twrPeriod.to_numpy.tolist
     weight = weight.to_numpy.tolist
-   
+
     @totalReturnTWR = return_twr.tolist
     @returnTWR = []
     ticker.zip(twr, weight).each do |value|
@@ -113,7 +115,7 @@ END_SQL
 
   # ref: https://stackoverflow.com/questions/5490952/how-to-merge-array-of-hashes-to-get-hash-of-arrays-of-values
   def collect_values(hashes)
-    {}.tap { |r| hashes.each { |h| h.each { |k, v| (r[k]||=[]) << v } } }
+    {}.tap { |r| hashes.each { |h| h.each { |k, v| (r[k] ||= []) << v } } }
   end
 
   # run query and convert result to a pandas dataframe
@@ -127,9 +129,7 @@ END_SQL
     data = ActiveRecord::Base.connection.execute(query)
     bycol = collect_values(data)
     bycol.each_key do |key|
-      if !bycol[key].empty? && bycol[key][1].is_a?(Date)
-        bycol[key].map! { |val| val.strftime('%F') }
-      end
+      bycol[key].map! { |val| val.strftime('%F') } if !bycol[key].empty? && bycol[key][1].is_a?(Date)
     end
     pd.DataFrame.new(data: bycol)
 
@@ -155,27 +155,26 @@ END_SQL
   def portfolio_as_of(portfolio, username, dt)
     portfolioname = portfolio.name
     # Get portfolio
-    query = <<END_SQL
-select ticker,side,price,quantity,tradeDate
-  from trades tr
-  join portfolios pr on pr.id=tr.portfolio_id
-  join clients cl on cl.id=pr.client_id
-  where
-   cl.username = '#{username}'
-   and pr.name = '#{portfolioname}'
-   and tr.tradeDate < '#{dt.strftime('%F')}'
-  order by tr.tradeDate asc
-END_SQL
+    query = <<~END_SQL
+      select ticker,side,price,quantity,tradeDate
+        from trades tr
+        join portfolios pr on pr.id=tr.portfolio_id
+        join clients cl on cl.id=pr.client_id
+        where
+         cl.username = '#{username}'
+         and pr.name = '#{portfolioname}'
+         and tr.tradeDate < '#{dt.strftime('%F')}'
+        order by tr.tradeDate asc
+    END_SQL
     trades = queryToDataFrame(query)
-    if trades.shape[0]>0
+    if trades.shape[0].positive?
       trades[:posChange] = (trades[:side] == 1 ? 1 : -1) * trades[:quantity]
       trades[:pos] = trades.groupby(:ticker).posChange.cumsum
       position = trades.groupby(:ticker).pos.last
-      position = position.reset_index()
+      position = position.reset_index
       position = position.set_index(position.ticker)
     else
-      position = pd.DataFrame.new(data: {ticker: [], pos: []} );
+      position = pd.DataFrame.new(data: { ticker: [], pos: [] })
     end
   end
-
 end

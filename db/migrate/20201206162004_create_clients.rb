@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreateClients < ActiveRecord::Migration[5.2]
   def change
     create_table :clients do |t|
@@ -8,6 +10,6 @@ class CreateClients < ActiveRecord::Migration[5.2]
       t.timestamps
     end
 
-    add_index :clients,:username
+    add_index :clients, :username
   end
 end
