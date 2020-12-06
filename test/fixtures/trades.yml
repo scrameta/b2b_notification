@@ -1,0 +1,17 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  ticker: MyString
+  side: 1
+  price: 1.5
+  quantity: 1
+  date: 2020-12-06
+  portfolio: one
+
+two:
+  ticker: MyString
+  side: 1
+  price: 1.5
+  quantity: 1
+  date: 2020-12-06
+  portfolio: two

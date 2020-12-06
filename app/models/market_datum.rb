@@ -1,0 +1,2 @@
+class MarketDatum < ApplicationRecord
+end

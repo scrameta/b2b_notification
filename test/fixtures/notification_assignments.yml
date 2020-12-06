@@ -1,0 +1,11 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  notification: one
+  client: one
+  read: 
+
+two:
+  notification: two
+  client: two
+  read: 
