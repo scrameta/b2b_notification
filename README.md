@@ -7,20 +7,37 @@ Clients may then pick up these text messages.
 Clients may also pick up a content and a few simple status on their investment portfolio.
 
 * Ruby version
-Anything recent should work, it was built and tested with 2.7.0. The standard install on Ubunutu 20.4.
+I think anything recent should work, I have not knowingly used any cutting edge or fancy features.
+
+The standard ruby and rails install via apt on Ubunutu 20.4 was used.
+As of now that is:
+rails: 5.2.3
+ruby : 2.7.0p0
 
 * System dependencies
-Required python3, pandas and numpy
+Requires python3, pandas and numpy
+
+As above, I used the standard Ubuntu 20.4 versions
+Python: 3.8.5
+pandas: 0.25.3
+numpy : 1.17.4
 
 * Database creation
-TODO: postgres..
-
-* Database initialization
-Execute the shell script ./runme
-This runs the usual migrate and see, followed by some custom seeding
+The project is set up with sqlite for development and test
+For production it is set up with postgres
+You will need to create the database as per config/database.yml - or modify the config
+rails db:migrate RAILS_ENV=$env
+rails db:seed RAILS_ENV=$env
 
 * How to run the test suite
-TODO
+RSpec is planned, but not yet implemented
+
+For now there is a manual test tool
+./test/curses_query_tool.rb
+Controls:
+  W:   up
+  S:   down
+  spc: enter
 
 * Choice of gems:
 pycall:
@@ -33,6 +50,10 @@ jwt/simple_command/bcrypt:
 These were recommended in a jwt authentication tutorial I found at pluralsight, a good training provider that we have used:
 http://www.pluralsight.com/guides/token-based-authentication-with-ruby-on-rails-5-api
 
+activerecord-insert_many
+High performance insertion using active record. Adding one at a time is very slow. 
+I starting off using sequel.import, but the rails integration of config with active record does not work for free.
 
-
+rspec/faker
+Test tool recommendation from a rails experienced friend
 

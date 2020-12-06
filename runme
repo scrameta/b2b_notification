@@ -1,7 +1,0 @@
-#!/bin/bash
-
-rails db:migrate
-rails db:seed
-
-echo Now run: rails server
-echo Test tool: ruby ./test/curses_query_tool.rb
