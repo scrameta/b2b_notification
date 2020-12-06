@@ -100,7 +100,7 @@ begin
     end
 
     def index
-      url = $baseurl + 'clientPortfolios'
+      url = $baseurl + 'client_portfolios'
       uri = URI.parse(url)
 
       req = Net::HTTP::Get.new(uri)
@@ -115,7 +115,7 @@ begin
     end
 
     def content(id)
-      url = $baseurl + "clientPortfolios/content/#{id}.json"
+      url = $baseurl + "client_portfolios/#{id}/content.json"
       uri = URI.parse(url)
 
       req = Net::HTTP::Get.new(uri)
@@ -127,7 +127,7 @@ begin
     end
 
     def valuation(id)
-      url = $baseurl + "clientPortfolios/valuation/#{id}.json"
+      url = $baseurl + "client_portfolios/#{id}/valuation.json"
       uri = URI.parse(url)
 
       req = Net::HTTP::Get.new(uri)
@@ -139,7 +139,7 @@ begin
     end
 
     def return(id)
-      url = $baseurl + "clientPortfolios/return/#{id}.json"
+      url = $baseurl + "client_portfolios/#{id}/return.json"
       uri = URI.parse(url)
 
       req = Net::HTTP::Get.new(uri)
@@ -159,7 +159,7 @@ begin
     end
 
     def index
-      url = $baseurl + 'clientNotifications'
+      url = $baseurl + 'client_notifications'
       uri = URI.parse(url)
 
       req = Net::HTTP::Get.new(uri)
@@ -174,7 +174,7 @@ begin
     end
 
     def show(id)
-      url = $baseurl + "clientNotifications/#{id}.json"
+      url = $baseurl + "client_notifications/#{id}.json"
       uri = URI.parse(url)
 
       req = Net::HTTP::Post.new(uri)
