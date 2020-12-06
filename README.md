@@ -10,17 +10,17 @@ Clients may also pick up a content and a few simple status on their investment p
 I think anything recent should work, I have not knowingly used any cutting edge or fancy features.
 
 The standard ruby and rails install via apt on Ubunutu 20.4 was used.
-As of now that is:
-rails: 5.2.3
-ruby : 2.7.0p0
+As of now that is:  
+rails: 5.2.3  
+ruby : 2.7.0p0  
 
 * System dependencies
 Requires python3, pandas and numpy
 
-As above, I used the standard Ubuntu 20.4 versions
-Python: 3.8.5
-pandas: 0.25.3
-numpy : 1.17.4
+As above, I used the standard Ubuntu 20.4 versions  
+Python: 3.8.5  
+pandas: 0.25.3  
+numpy : 1.17.4  
 
 * Database creation
 The project is set up with sqlite for development and test
@@ -34,10 +34,10 @@ RSpec is planned, but not yet implemented
 
 For now there is a manual test tool
 ./test/curses_query_tool.rb
-Controls:
-  W:   up
-  S:   down
-  spc: enter
+Controls:  
+  W:   up  
+  S:   down  
+  spc: enter  
 
 * Choice of gems:
 pycall:
