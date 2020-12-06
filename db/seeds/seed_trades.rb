@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-require 'sequel'
 require 'byebug'
 require 'pycall/import'
 # require 'business'
@@ -10,10 +9,6 @@ require 'pycall/import'
 #  extra_working_dates: [], # Makes the calendar to consider a weekend day as a working day.
 # )
 # dateIter = calendar.add_business_days(dateIter,1)
-
-DB = Sequel.connect('sqlite://db/development.sqlite3') # TODO: env
-# DB = Sequel.connect(ARGV[1]) #TODO env
-# DB = Sequel.connect('postgres://user:password@host:port/database_name') # requires pg
 
 class TradeSeeder
   include PyCall::Import
@@ -40,17 +35,21 @@ class TradeSeeder
     # For now keep it simple and just store these trades
 
     # Store it for a client
-    portfolio_id = @database["select p.id from portfolios p join clients c on p.client_id=c.id where c.username='#{client}' and p.name='#{portfolio_name}'"]
+    portfolio_id = @database.execute("select p.id from portfolios p join clients c on p.client_id=c.id where c.username='#{client}' and p.name='#{portfolio_name}'")
+    portfolio_id = portfolio_id[0]['id']
 
     # ticker,buy/sell,price,qty,date
     portfolio_ids = Array.new(target_portfolio.shape[0], portfolio_id)
-    investment_dates = Array.new(target_portfolio.shape[0], @investment_date)
+    investment_dates = Array.new(target_portfolio.shape[0], @investment_date.strftime('%F'))
     ticker_array = target_portfolio.ticker.to_numpy.tolist
     side = Array.new(target_portfolio.shape[0], 1) # 1=buy,2=sell,3=shortsell etc
     price = target_portfolio.price.to_numpy.tolist
     quantity = target_portfolio.shares.to_numpy.tolist
+
     rows = ticker_array.zip(side, price, quantity, investment_dates, portfolio_ids)
-    @database[:trades].import(%i[ticker side price quantity tradeDate portfolio_id], rows)
+    keys = ['ticker', 'side', 'price', 'quantity', 'tradeDate', 'portfolio_id']
+    rows.map! { |row| Hash[keys.zip(row)] }
+    Trade.insert_many(rows)
   end
 
   private
@@ -77,18 +76,15 @@ class TradeSeeder
     opens = <<~END_SQL
       select ticker,open,date from market_data where date='#{@investment_date.strftime('%F')}'
     END_SQL
-    # Direct fetch with sequels
-    opens_data = DB[opens]
+
+    # Direct fetch with active record
+    opens_data = @database.execute(opens)
     ticker = []
     openprice = []
     opens_data.each do |row|
-      ticker.append(row[:ticker])
-      openprice.append(row[:open])
+      ticker.append(row['ticker'])
+      openprice.append(row['open'])
     end
     @prices = pd.DataFrame.new(data: { ticker: ticker, price: openprice })
   end
 end
-
-seeder = TradeSeeder.new(database = DB, investment_date = Date.new(2020, 10, 1))
-positions = seeder.seed(client = 'bgates', portfolio = 'my first portfolio', investment = 100_000)
-positions = seeder.seed(client = 'mzuckerberg', portfolio = 'save the world', investment = 500_000)

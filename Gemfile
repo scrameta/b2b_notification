@@ -69,3 +69,14 @@ gem 'simple_command'
 
 # Data frames via python
 gem 'pycall'
+
+# Testing
+group :development, :test do
+  gem 'rspec-rails', '~> 3.6'
+  gem 'faker'
+  gem 'factory_bot_rails'
+  gem 'database_cleaner'
+end
+
+# Active record fast insert
+gem 'activerecord-insert_many'
