@@ -11,8 +11,6 @@ class CreateMarketData < ActiveRecord::Migration[5.2]
       t.integer :volume
       t.float :dividend_amount
       t.float :split_coefficient
-
-      t.timestamps
     end
   end
 end

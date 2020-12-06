@@ -5,10 +5,8 @@ class CreateTrades < ActiveRecord::Migration[5.2]
       t.integer :side
       t.float :price
       t.integer :quantity
-      t.date :date
+      t.date :tradeDate
       t.references :portfolio, foreign_key: true
-
-      t.timestamps
     end
   end
 end

@@ -1,0 +1,9 @@
+#!/bin/bash
+
+rails db:migrate
+rails db:seed
+ruby ./setup/seed_market_data.rb conn setup/mktdata/csvs/
+ruby ./setup/seed_trades.rb conn
+
+echo Now run: rails server
+echo Test tool: ruby ./queries/tool.rb

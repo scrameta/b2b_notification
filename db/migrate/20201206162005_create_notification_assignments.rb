@@ -3,7 +3,7 @@ class CreateNotificationAssignments < ActiveRecord::Migration[5.2]
     create_table :notification_assignments do |t|
       t.references :notification, foreign_key: true
       t.references :client, foreign_key: true
-      t.logical :read
+      t.boolean :read
 
       t.timestamps
     end

@@ -4,9 +4,11 @@ class CreateEmployees < ActiveRecord::Migration[5.2]
       t.string :username
       t.string :name
       t.string :surname
-      t.logical :admin
+      t.boolean :admin
 
       t.timestamps
     end
+
+    add_index :employees,:username
   end
 end
