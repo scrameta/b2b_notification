@@ -4,7 +4,7 @@ This is an implementation of a b2b notication api.
 
 An admin creates text messages and assigns them to clients.
 Clients may then pick up these text messages.
-Clients may also pick up a content and a few simple status on their investment portfolio.
+Clients may also pick up a content and a few simple stats on their investment portfolio.
 
 ## Ruby version
 I think anything recent should work, I have not knowingly used any cutting edge or fancy features.
