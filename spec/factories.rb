@@ -24,4 +24,8 @@ FactoryBot.define do
   factory :random_notification, class: Notification do
     message {Faker::Lorem.paragraph}
   end
+
+  factory :portfolio, class: Portfolio do
+    name {Faker::Lorem.sentence}
+  end
 end
