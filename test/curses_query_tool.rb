@@ -10,6 +10,7 @@ require 'byebug'
 $baseurl = 'http://localhost:3000/'
 
 # TODO: Generate swagger docs: Got swagger running, but some issues with swagger gem to investigate
+# This looks worth a look... https://github.com/JsonApiClient/json_api_client
 
 Curses.init_screen
 begin

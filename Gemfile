@@ -68,6 +68,7 @@ gem 'tzinfo-data', platforms: %i[mingw mswin x64_mingw jruby]
 # Authentication
 gem 'jwt'
 gem 'simple_command'
+# knock -> should i use it instead? https://github.com/nsarno/knock
 
 # Data frames via python
 gem 'pycall'
@@ -82,3 +83,4 @@ end
 
 # Active record fast insert
 gem 'activerecord-insert_many'
+

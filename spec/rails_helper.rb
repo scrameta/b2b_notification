@@ -43,17 +43,23 @@ RSpec.configure do |config|
   config.use_transactional_fixtures = false
   config.before(:suite) do
     DatabaseCleaner.clean_with(:truncation)
-  endconfig.before(:each) do
+  end
+  config.before(:each) do
     DatabaseCleaner.strategy = :transaction
-  endconfig.before(:each, :js => true) do
+  end
+  config.before(:each, :js => true) do
     DatabaseCleaner.strategy = :truncation
-  endconfig.before(:each) do
+  end
+  config.before(:each) do
     DatabaseCleaner.start
-  endconfig.after(:each) do
+  end
+  config.after(:each) do
     DatabaseCleaner.clean
-  endconfig.before(:all) do
+  end
+  config.before(:all) do
     DatabaseCleaner.start
-  endconfig.after(:all) do
+  end
+  config.after(:all) do
     DatabaseCleaner.clean
   end  
 

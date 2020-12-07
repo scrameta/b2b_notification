@@ -9,8 +9,8 @@
 #   Character.create(name: 'Luke', movie: movies.first)
 
 # Start with dev setup
-$LOAD_PATH.unshift File.expand_path('db/seeds')
-require 'development'
+#$LOAD_PATH.unshift File.expand_path('db/seeds')
+#require 'development'
 
 
 
