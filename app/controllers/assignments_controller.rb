@@ -19,7 +19,11 @@ class AssignmentsController < ApplicationController
 
   def show
     verify_admin { return }
-    @assignment = NotificationAssignment.find(params[:id])
+    begin
+      @assignment = NotificationAssignment.find(params[:id])
+    rescue
+      render json: { errors: "No such assignment" }, status: 422
+    end
   end
 
   def update
@@ -35,7 +39,12 @@ class AssignmentsController < ApplicationController
 
   def destroy
     verify_admin { return }
-    @assignment = NotificationAssignment.find(params[:id])
+    begin
+      @assignment = NotificationAssignment.find(params[:id])
+    rescue
+      render json: { errors: "No such assignment" }, status: 422
+      return
+    end
     if @assignment.destroy
       @assignment
     else
@@ -52,6 +61,7 @@ class AssignmentsController < ApplicationController
       @notification = Notification.find(params[:notification_id])
       params_adj[:client] = @client
       params_adj[:notification] = @notification
+      params_adj[:read] = false
       params_adj.delete(:notification_id)
       params_adj
     else
@@ -64,6 +74,7 @@ class AssignmentsController < ApplicationController
     @client = Client.find_by({ username: params_adj[:client] })
     if @client
       params_adj[:client] = @client
+      params_adj[:read] = false
       params_adj
     else
       render json: { errors: "#{params_adj[:client]} unknown" }, status: 422 and yield

@@ -19,12 +19,21 @@ class NotificationsController < ApplicationController
 
   def show
     verify_admin { return }
-    @notification = Notification.find(params[:id])
+    begin
+      @notification = Notification.find(params[:id])
+    rescue
+      render json: { errors: "No such notification" }, status: 422
+    end
   end
 
   def update
     verify_admin { return }
-    @notification = Notification.find(params[:id])
+    begin
+      @notification = Notification.find(params[:id])
+    rescue
+      render json: { errors: "No such notification" }, status: 422
+      return
+    end
     params_adj = notification_params { return }
     if @notification.update(params_adj)
       @notification
@@ -35,7 +44,12 @@ class NotificationsController < ApplicationController
 
   def destroy
     verify_admin { return }
-    @notification = Notification.find(params[:id])
+    begin
+      @notification = Notification.find(params[:id])
+    rescue
+      render json: { errors: "No such notification" }, status: 422
+      return
+    end
     if @notification.destroy
       @notification
     else
