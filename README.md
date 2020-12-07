@@ -30,9 +30,10 @@ rails db:migrate RAILS_ENV=$env
 rails db:seed RAILS_ENV=$env
 
 ## How to run the test suite
-RSpec is planned, but not yet implemented
+The rspec tests may be run with:
+bundle exec rspec spec
 
-For now there is a manual test tool
+There is also a manual test tool:
 ./test/curses_query_tool.rb
 Controls:  
   *   W:   up  
