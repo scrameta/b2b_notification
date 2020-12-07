@@ -3,7 +3,7 @@
 class AssignmentsController < ApplicationController
   def index
     verify_admin { return }
-    @assignments = NotificationAssignment.where(params.require('notification_id'))
+    @assignments = NotificationAssignment.where(notification_id: params.require('notification_id'))
   end
 
   def create
